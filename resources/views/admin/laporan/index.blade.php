@@ -15,7 +15,12 @@
             <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
         </div>
         <div class="col-md-4">
-            <button type="submit" class="btn btn-primary-custom w-100">Filter Laporan</button>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom w-100">Filter Laporan</button>
+                <a href="{{ route('admin.laporan.excel', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-success w-100">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+                </a>
+            </div>
         </div>
     </form>
 </div>
@@ -45,14 +50,16 @@
                 <tr><th>Peringkat</th><th>Nama Produk</th><th>Total Terjual</th><th>Total Pendapatan</th></tr>
             </thead>
             <tbody>
-                @foreach($produkTerlaris as $index => $item)
+                @forelse($produkTerlaris as $index => $item)
                 <tr>
                     <td><strong>#{{ $index + 1 }}</strong></td>
                     <td>{{ $item->nama_snapshot }}</td>
                     <td class="fw-bold">{{ $item->total_qty }}</td>
                     <td class="text-primary fw-bold">Rp {{ number_format($item->total_pendapatan, 0, ',', '.') }}</td>
                 </tr>
-                @endforeach
+                @empty
+                <tr><td colspan="4" class="text-center text-muted py-4">Belum ada penjualan pada periode ini.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

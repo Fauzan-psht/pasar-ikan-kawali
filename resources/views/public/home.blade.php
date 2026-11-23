@@ -5,13 +5,13 @@
 @section('content')
 
 {{-- HERO --}}
-<section class="hero">
+<section class="hero {{ $profil->banner ? 'has-banner' : '' }}" @if($profil->banner) style="--hero-banner: url('{{ asset('storage/'.$profil->banner) }}')" @endif>
     <div class="container hero-content">
         <div class="row align-items-center">
             <div class="col-lg-7">
                 <div class="hero-badge">
                     <span class="dot"></span>
-                    Pasar Ikan Air Tawar Terpercaya di Kawali
+                    {{ $profil->nama }} — Pasar Ikan Air Tawar Terpercaya
                 </div>
                 <h1>
                     Ikan Air Tawar <span class="highlight">Segar & Berkualitas</span> untuk Keluarga Anda
@@ -95,7 +95,7 @@
             <h2>Pilihan Ikan Air Tawar</h2>
             <p>Ikan konsumsi per kg dan benih per ekor, siap dipesan online.</p>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 public-product-grid">
             @forelse($produkUnggulan as $p)
             <div class="col-md-6 col-lg-4">
                 <div class="card-modern">
@@ -137,17 +137,19 @@
     <div class="container py-5">
         <div class="section-title">
             <span class="eyebrow">Lokasi Kami</span>
-            <h2>Kunjungi Pasar Ikan Kawali</h2>
+            <h2>Kunjungi {{ $profil->nama }}</h2>
             <p>{{ $profil->alamat }}</p>
         </div>
         <div class="maps-wrapper">
-            {!! $profil->maps_embed ?: '<div style="padding:3rem;text-align:center;color:#64748b;">Peta belum diatur. Silakan atur di panel admin.</div>' !!}
+            @include('public.partials.map')
         </div>
+        @if($profil->maps_url)
         <div class="text-center mt-4">
             <a href="{{ $profil->maps_url }}" target="_blank" class="btn btn-hero-primary">
                 <i class="bi bi-geo-alt-fill me-2"></i> Buka di Google Maps
             </a>
         </div>
+        @endif
     </div>
 </section>
 

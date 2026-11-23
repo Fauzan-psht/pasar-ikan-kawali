@@ -40,7 +40,7 @@
             </div>
             <div class="col-lg-7">
                 <div class="maps-wrapper">
-                    {!! $profil->maps_embed ?: '<div style="padding:4rem;text-align:center;color:#64748b;">Peta belum diatur. Silakan atur di panel admin.</div>' !!}
+                    @include('public.partials.map')
                 </div>
             </div>
         </div>

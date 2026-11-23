@@ -20,7 +20,7 @@
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="panel p-4 bg-white rounded shadow-sm border">
-                    <table class="table align-middle">
+                    <table class="table align-middle cart-table">
                         <thead>
                             <tr>
                                 <th>Produk</th>
@@ -35,10 +35,10 @@
                             @foreach($cart as $id => $details)
                                 @php $total += $details['harga'] * $details['qty'] @endphp
                                 <tr>
-                                    <td>
+                                    <td data-label="Produk">
                                         <div class="d-flex align-items-center gap-3">
                                             @if($details['foto'])
-                                                <img src="{{ asset('storage/'.$details['foto']) }}" width="60" class="rounded">
+                                                <img src="{{ asset('storage/'.$details['foto']) }}" width="60" height="60" class="rounded object-fit-cover" alt="{{ $details['nama'] }}">
                                             @endif
                                             <div>
                                                 <div class="fw-bold">{{ $details['nama'] }}</div>
@@ -46,13 +46,13 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>Rp {{ number_format($details['harga'], 0, ',', '.') }}</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm update-cart" data-id="{{ $id }}" value="{{ $details['qty'] }}" min="0.1" step="0.1">
+                                    <td data-label="Harga">Rp {{ number_format($details['harga'], 0, ',', '.') }}</td>
+                                    <td data-label="Jumlah">
+                                        <input type="number" class="form-control form-control-sm update-cart" data-id="{{ $id }}" value="{{ $details['qty'] }}" min="0.1" step="0.1" aria-label="Jumlah {{ $details['nama'] }}">
                                     </td>
-                                    <td class="fw-bold">Rp {{ number_format($details['harga'] * $details['qty'], 0, ',', '.') }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger remove-from-cart" data-id="{{ $id }}"><i class="bi bi-trash"></i></button>
+                                    <td data-label="Subtotal" class="fw-bold">Rp {{ number_format($details['harga'] * $details['qty'], 0, ',', '.') }}</td>
+                                    <td data-label="Hapus">
+                                        <button class="btn btn-sm btn-danger remove-from-cart" data-id="{{ $id }}" aria-label="Hapus {{ $details['nama'] }}"><i class="bi bi-trash"></i></button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -86,6 +86,36 @@
     </div>
 </section>
 @endsection
+
+@push('styles')
+<style>
+    @media (max-width: 767.98px) {
+        .cart-table thead { display: none; }
+        .cart-table, .cart-table tbody, .cart-table tr, .cart-table td { display: block; width: 100%; }
+        .cart-table tr {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.25rem 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .cart-table td { padding: 0.35rem 0; border: 0; text-align: left !important; }
+        .cart-table td::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: 0.2rem;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .cart-table td:first-child { grid-column: 1 / -1; }
+        .cart-table td:first-child::before { display: none; }
+        .cart-table td:last-child { display: flex; justify-content: flex-end; align-items: center; }
+        .cart-table .update-cart { max-width: 6rem; min-height: 42px; }
+        .cart-table .remove-from-cart { min-width: 42px; min-height: 42px; }
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

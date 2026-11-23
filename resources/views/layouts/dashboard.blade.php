@@ -227,11 +227,45 @@
 
         /* Mobile */
         .sidebar-toggle { display: none; }
+        .sidebar-backdrop { display: none; }
         @media (max-width: 991px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
             .main-wrapper { margin-left: 0; }
             .sidebar-toggle { display: inline-flex; }
+            .sidebar-backdrop.show {
+                display: block;
+                position: fixed;
+                inset: 0;
+                z-index: 1035;
+                width: 100%;
+                height: 100%;
+                border: 0;
+                background: rgba(15, 23, 42, 0.48);
+            }
+            .topbar { padding: 0.75rem 1rem; }
+            .topbar h5 { max-width: 50vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1rem; }
+            .content-area { padding: 1rem; }
+            .content-area > .d-flex.justify-content-between { flex-wrap: wrap; gap: 0.75rem; }
+            .content-area > .d-flex.justify-content-between > form { flex: 1 1 100%; }
+            .content-area > .d-flex.justify-content-between > form .form-control { min-width: 0; }
+            .panel { padding: 1rem; }
+            .table-responsive { -webkit-overflow-scrolling: touch; }
+            .table-responsive > .table { min-width: 620px; }
+            .stat-card { padding: 1rem; }
+            .stat-card .stat-value { font-size: clamp(1.15rem, 5vw, 1.5rem); overflow-wrap: anywhere; }
+            .btn, .form-control, .form-select { min-height: 42px; }
+            .modal-dialog { margin: 0.75rem; }
+        }
+        @media (max-width: 575.98px) {
+            .sidebar { width: min(290px, 86vw); }
+            .topbar { gap: 0.5rem; }
+            .topbar > .d-flex { min-width: 0; gap: 0.5rem !important; }
+            .topbar .user-info { gap: 0.4rem; }
+            .topbar .avatar { width: 34px; height: 34px; }
+            .content-area { padding: 0.75rem; }
+            .content-area > .d-flex.justify-content-between > form { width: 100%; }
+            .panel { padding: 0.85rem; border-radius: 12px; }
         }
     </style>
     @stack('styles')
@@ -287,7 +321,7 @@
 <div class="main-wrapper">
     <div class="topbar">
         <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-sm btn-light sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('show')">
+            <button class="btn btn-sm btn-light sidebar-toggle" type="button" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" onclick="toggleDashboardSidebar()">
                 <i class="bi bi-list"></i>
             </button>
             <h5>@yield('page_title', 'Dashboard')</h5>
@@ -325,7 +359,42 @@
     </div>
 </div>
 
+<button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Tutup menu" onclick="closeDashboardSidebar()"></button>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleDashboardSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const toggle = document.querySelector('.sidebar-toggle');
+        const isOpen = sidebar.classList.toggle('show');
+
+        backdrop.classList.toggle('show', isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    function closeDashboardSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const toggle = document.querySelector('.sidebar-toggle');
+
+        sidebar.classList.remove('show');
+        backdrop.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    document.querySelectorAll('#sidebar a').forEach(link => {
+        link.addEventListener('click', closeDashboardSidebar);
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeDashboardSidebar();
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 991) closeDashboardSidebar();
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

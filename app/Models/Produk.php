@@ -38,6 +38,11 @@ class Produk extends Model
         return $this->belongsTo(Kategori::class);
     }
 
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
     public function scopeAktif($query)
     {
         return $query->where('status', true);

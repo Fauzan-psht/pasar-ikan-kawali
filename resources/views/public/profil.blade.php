@@ -6,12 +6,19 @@
 <div class="page-header">
     <div class="container">
         <nav class="breadcrumb-custom mb-2"><a href="{{ route('public.home') }}">Beranda</a> / Profil</nav>
-        <h1>Tentang Pasar Ikan Kawali</h1>
+        <h1>Tentang {{ $profil->nama }}</h1>
     </div>
 </div>
 
 <section class="py-5">
     <div class="container py-4">
+        @if($profil->deskripsi)
+        <div class="card-modern p-4 mb-4">
+            <h2 style="color:var(--primary-900);margin-bottom:0.75rem;">{{ $profil->nama }}</h2>
+            <p style="color:var(--gray-700);line-height:1.8;margin-bottom:0;">{{ $profil->deskripsi }}</p>
+        </div>
+        @endif
+
         <div class="row g-4">
             <div class="col-lg-6">
                 <div class="card-modern p-4">

@@ -26,7 +26,7 @@
         <div class="row g-4">
             <div class="col-lg-5">
                 <div class="card-modern" style="overflow:hidden;">
-                    <div class="card-img" style="height:340px;font-size:5rem;">
+                    <div class="card-img product-detail-image" style="height:340px;font-size:5rem;">
                         @if($produk->foto)
                             <img src="{{ asset('storage/'.$produk->foto) }}" alt="{{ $produk->nama }}">
                         @else
@@ -56,12 +56,12 @@
                     <form action="{{ route('public.cart.add') }}" method="POST" class="mt-3">
                         @csrf
                         <input type="hidden" name="produk_id" value="{{ $produk->id }}">
-                        <div class="d-flex gap-2 align-items-end mb-3">
-                            <div style="max-width:140px;">
+                        <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-end mb-3">
+                                <div class="product-quantity">
                                 <label class="form-label fw-semibold small">Jumlah ({{ $produk->satuan }})</label>
                                 <input type="number" name="qty" class="form-control" value="1" min="{{ $produk->satuan === 'kg' ? '0.1' : '1' }}" step="{{ $produk->satuan === 'kg' ? '0.1' : '1' }}" max="{{ $produk->stok }}" required>
                             </div>
-                            <button type="submit" class="btn btn-hero-primary flex-grow-1">
+                                <button type="submit" class="btn btn-hero-primary flex-grow-1 product-add-button">
                                 <i class="bi bi-cart-plus me-2"></i> Tambah ke Keranjang
                             </button>
                         </div>
@@ -93,3 +93,13 @@
     </div>
 </section>
 @endsection
+
+@push('styles')
+<style>
+    @media (max-width: 767.98px) {
+        .product-detail-image { height: min(72vw, 300px) !important; }
+        .product-quantity { width: 100%; }
+        .product-add-button { min-height: 48px; }
+    }
+</style>
+@endpush

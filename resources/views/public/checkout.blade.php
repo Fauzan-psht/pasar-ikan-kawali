@@ -15,6 +15,12 @@
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <p class="fw-semibold mb-1">Periksa kembali data pesanan:</p>
+                <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+        @endif
 
         <form action="{{ route('public.checkout.process') }}" method="POST">
             @csrf
@@ -30,7 +36,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nomor WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" name="whatsapp" class="form-control" required value="{{ old('whatsapp') }}" placeholder="08xxxxxx">
+                            <input type="tel" name="whatsapp" class="form-control" required value="{{ old('whatsapp') }}" placeholder="08xxxxxx" autocomplete="tel" inputmode="tel">
                         </div>
 
                         <hr class="my-4">
@@ -86,7 +92,7 @@
                             <label class="form-check-label" for="transfer">Transfer Bank (Manual)</label>
                         </div>
 
-                        <button type="submit" class="btn btn-hero-primary w-100 py-3 fs-5">
+                        <button type="submit" class="btn btn-hero-primary w-100 py-3 fs-5 checkout-submit">
                             <i class="bi bi-check-circle me-2"></i> Buat Pesanan
                         </button>
                     </div>
@@ -96,6 +102,14 @@
     </div>
 </section>
 @endsection
+
+@push('styles')
+<style>
+    @media (max-width: 767.98px) {
+        .checkout-submit { min-height: 52px; }
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>

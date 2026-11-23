@@ -1,12 +1,15 @@
-@php $profil = \App\Models\ProfilPasar::current(); @endphp
 <footer class="footer">
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-4">
                 <h5 class="d-flex align-items-center gap-2">
-                    <span class="brand-icon" style="width:34px;height:34px;font-size:1rem;background:linear-gradient(135deg,var(--accent-teal),var(--accent-cyan));border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;">
-                        <i class="bi bi-fish"></i>
-                    </span>
+                    @if($profil->logo)
+                        <img src="{{ asset('storage/'.$profil->logo) }}" alt="Logo {{ $profil->nama }}" style="width:34px;height:34px;object-fit:contain;border-radius:8px;background:#fff;padding:2px;">
+                    @else
+                        <span class="brand-icon" style="width:34px;height:34px;font-size:1rem;background:linear-gradient(135deg,var(--accent-teal),var(--accent-cyan));border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;">
+                            <i class="bi bi-fish"></i>
+                        </span>
+                    @endif
                     {{ $profil->nama }}
                 </h5>
                 <p style="font-size:0.92rem;line-height:1.7;">

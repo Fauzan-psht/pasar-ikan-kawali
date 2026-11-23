@@ -1,10 +1,11 @@
+@php $profil = \App\Models\ProfilPasar::current(); @endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Pasar Ikan Kawali') — Pasar Ikan Air Tawar</title>
-    <meta name="description" content="@yield('meta_description', 'Pasar Ikan Kawali — pusat ikan air tawar segar dan benih berkualitas di Kawali, Ciamis.')">
+    <title>@yield('title', $profil->nama) — {{ $profil->nama }}</title>
+    <meta name="description" content="@yield('meta_description', $profil->deskripsi)">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -35,6 +36,7 @@
         .navbar-custom.scrolled { padding: 0.5rem 0; background: rgba(10, 37, 64, 0.98); }
         .navbar-custom .navbar-brand { color: #fff; font-size: 1.35rem; display: flex; align-items: center; gap: 0.6rem; }
         .navbar-custom .navbar-brand .brand-icon { width: 38px; height: 38px; background: linear-gradient(135deg, var(--accent-teal), var(--accent-cyan)); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
+        .navbar-custom .navbar-brand .brand-logo { width: 38px; height: 38px; flex: 0 0 38px; object-fit: contain; border-radius: 10px; background: #fff; padding: 2px; }
         .navbar-custom .nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 500; padding: 0.5rem 1rem !important; font-size: 0.95rem; transition: color 0.2s ease; position: relative; }
         .navbar-custom .nav-link:hover, .navbar-custom .nav-link.active { color: #fff !important; }
         .navbar-custom .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 1rem; right: 1rem; height: 2px; background: linear-gradient(90deg, var(--accent-teal), var(--accent-cyan)); border-radius: 2px; }
@@ -42,6 +44,7 @@
         .btn-nav-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4); color: #fff; }
 
         .hero { background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 45%, var(--primary-500) 100%); color: #fff; padding: 9rem 0 6rem; position: relative; overflow: hidden; }
+        .hero.has-banner { background-image: linear-gradient(135deg, rgba(10,37,64,0.9), rgba(20,83,143,0.78) 55%, rgba(46,134,222,0.68)), var(--hero-banner); background-size: cover; background-position: center; }
         .hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 30%, rgba(20,184,166,0.18) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(6,182,212,0.15) 0%, transparent 45%); pointer-events: none; }
         .hero::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 80px; background: var(--gray-50); clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 80%); }
         .hero-content { position: relative; z-index: 2; }
@@ -91,8 +94,102 @@
         .page-header .breadcrumb-custom a { color: var(--accent-cyan); text-decoration: none; }
 
         .maps-wrapper { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(10,37,64,0.1); border: 1px solid var(--gray-100); }
-        .maps-wrapper iframe { display: block; width: 100%; border: 0; }
+        .maps-wrapper iframe { display: block; width: 100%; min-height: 350px; border: 0; }
         .stars { color: var(--accent-gold); }
+
+        .mobile-bottom-nav { display: none; }
+        .btn-nav-login { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+        @media (max-width: 991.98px) {
+            .navbar-custom .navbar-collapse {
+                margin-top: 0.75rem;
+                padding: 0.5rem 1rem 1rem;
+                border-radius: 0.75rem;
+                background: var(--primary-900);
+            }
+            .navbar-custom .navbar-nav { align-items: stretch !important; }
+            .navbar-custom .nav-link { padding: 0.75rem 0.25rem !important; }
+            .navbar-custom .nav-link.active::after { left: 0.25rem; right: auto; width: 2rem; }
+            .btn-nav-login { margin-top: 0.5rem; min-height: 44px; }
+        }
+
+        @media (max-width: 767.98px) {
+            body { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+            .navbar-custom { padding: 0.6rem 0; }
+            .navbar-custom .navbar-brand { gap: 0.45rem; font-size: 1.05rem; }
+            .navbar-custom .navbar-brand .brand-icon { width: 34px; height: 34px; font-size: 1.05rem; }
+            .navbar-custom .navbar-brand .brand-logo { width: 34px; height: 34px; flex-basis: 34px; }
+            .hero { padding: 6.5rem 0 3.5rem; }
+            .hero::after { height: 42px; }
+            .hero h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+            .hero p.lead { font-size: 1rem; }
+            .hero .btn-hero-primary, .hero .btn-hero-outline { flex: 1 1 100%; text-align: center; }
+            .hero .d-flex.gap-4 { gap: 1rem !important; justify-content: space-between; }
+            .hero .d-flex.gap-4 strong { font-size: 1.25rem !important; }
+            .section-title { margin-bottom: 2rem; }
+            .section-title h2 { font-size: 1.65rem; }
+            .page-header { padding: 6rem 0 2.25rem; }
+            .page-header::after { height: 30px; }
+            .page-header h1 { font-size: 1.8rem; overflow-wrap: anywhere; }
+            .card-modern { border-radius: 12px; }
+            .card-modern .card-img { height: 150px; }
+            .card-modern .card-body { padding: 1rem; }
+            .public-product-grid { --bs-gutter-x: 0.75rem; --bs-gutter-y: 0.75rem; }
+            .public-product-grid .card-modern .card-img { height: 132px; }
+            .public-product-grid .card-modern .card-title { font-size: 0.98rem; }
+            .public-product-grid .card-modern .price { font-size: 1rem; }
+            .public-product-grid .card-modern .btn-detail { min-height: 44px; font-size: 0.88rem; }
+            .public-pagination { max-width: 100%; overflow-x: auto; }
+            .maps-wrapper iframe { min-height: 280px; }
+            .footer { padding-top: 2.5rem; }
+            .footer-bottom { margin-top: 1.5rem; padding-bottom: 1rem; }
+            .wa-float { right: 16px; bottom: calc(5rem + env(safe-area-inset-bottom)); width: 50px; height: 50px; }
+            .mobile-bottom-nav {
+                position: fixed;
+                z-index: 1035;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                padding: 0.45rem 0.25rem calc(0.45rem + env(safe-area-inset-bottom));
+                background: rgba(255, 255, 255, 0.97);
+                border-top: 1px solid var(--gray-100);
+                box-shadow: 0 -8px 24px rgba(10, 37, 64, 0.08);
+                backdrop-filter: blur(12px);
+            }
+            .mobile-bottom-nav a {
+                display: flex;
+                min-height: 48px;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.15rem;
+                color: #64748b;
+                text-decoration: none;
+                font-size: 0.68rem;
+                font-weight: 600;
+            }
+            .mobile-bottom-nav a > i, .mobile-cart-icon { font-size: 1.15rem; line-height: 1; }
+            .mobile-bottom-nav a.active { color: var(--primary-700); }
+            .mobile-cart-icon { position: relative; }
+            .mobile-cart-icon span {
+                position: absolute;
+                top: -0.5rem;
+                right: -0.7rem;
+                min-width: 1rem;
+                padding: 0.1rem 0.25rem;
+                border-radius: 999px;
+                background: #ef4444;
+                color: #fff;
+                font-size: 0.6rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 359.98px) {
+            .public-product-grid > [class*="col-"] { width: 100%; }
+        }
     </style>
     @stack('styles')
 </head>
@@ -104,9 +201,8 @@
 
 @include('public.partials.footer')
 
-@php $profil = \App\Models\ProfilPasar::current(); @endphp
 @if($profil->whatsapp)
-<a href="https://wa.me/{{ preg_replace('/^0/', '62', $profil->whatsapp) }}" target="_blank" class="wa-float" title="Hubungi via WhatsApp">
+<a href="https://wa.me/{{ preg_replace('/^0/', '62', $profil->whatsapp) }}" target="_blank" rel="noopener noreferrer" class="wa-float" title="Hubungi via WhatsApp" aria-label="Hubungi via WhatsApp">
     <i class="bi bi-whatsapp"></i>
 </a>
 @endif

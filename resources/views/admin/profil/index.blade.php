@@ -75,9 +75,9 @@
                     <input type="url" name="maps_url" class="form-control" value="{{ old('maps_url', $profil->maps_url) }}" placeholder="https://maps.app.goo.gl/...">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Embed Code Google Maps (Iframe)</label>
-                    <textarea name="maps_embed" class="form-control" rows="3" placeholder='<iframe src="..."></iframe>'>{{ old('maps_embed', $profil->maps_embed) }}</textarea>
-                    <small class="text-muted">Buka Google Maps -> Share -> Embed a map -> Copy HTML.</small>
+                    <label class="form-label fw-semibold">Lokasi atau Embed Code Google Maps</label>
+                    <textarea name="maps_embed" class="form-control" rows="3" placeholder="Masukkan nama/alamat lokasi, Plus Code, atau kode iframe Google Maps">{{ old('maps_embed', $profil->maps_embed) }}</textarea>
+                    <small class="text-muted">Bisa isi alamat/Plus Code, atau salin kode iframe dari Google Maps.</small>
                 </div>
             </div>
         </div>

@@ -25,7 +25,7 @@
             </a>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4 public-product-grid">
             @forelse($produks as $p)
             <div class="col-md-6 col-lg-4">
                 <div class="card-modern">
@@ -56,7 +56,35 @@
             @endforelse
         </div>
 
-        <div class="mt-4">{{ $produks->links() }}</div>
+        <div class="public-pagination mt-4">{{ $produks->onEachSide(1)->links('pagination::bootstrap-5') }}</div>
     </div>
 </section>
 @endsection
+
+@push('styles')
+<style>
+    .public-pagination .pagination { margin-bottom: 0; }
+    .public-pagination .page-link {
+        display: inline-flex;
+        min-width: 2.25rem;
+        min-height: 2.25rem;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-700);
+        border-color: var(--gray-200);
+    }
+    .public-pagination .page-item.active .page-link {
+        background-color: var(--primary-600);
+        border-color: var(--primary-600);
+        color: #fff;
+    }
+    .public-pagination .page-link:focus {
+        box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.18);
+    }
+    .public-pagination .small { font-size: 0.82rem; }
+
+    @media (max-width: 575.98px) {
+        .public-pagination .page-link { min-width: 2.6rem; min-height: 2.6rem; }
+    }
+</style>
+@endpush

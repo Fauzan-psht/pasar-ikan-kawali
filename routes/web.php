@@ -16,7 +16,7 @@ Route::get('/katalog', [KatalogController::class, 'index'])->name('public.katalo
 Route::get('/katalog/{slug}', [KatalogController::class, 'detail'])->name('public.produk.detail');
 Route::get('/kontak', [KontakController::class, 'index'])->name('public.kontak');
 
-// ===== ROUTE KERANJANG & CHECKOUT =====
+// ===== ROUTE KERANJANG & CHECKOUT (TANPA LOGIN) =====
 Route::get('/cart', [CartController::class, 'index'])->name('public.cart');
 Route::post('/cart/add', [CartController::class, 'add'])->name('public.cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('public.cart.update');
@@ -26,22 +26,23 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('public.chec
 Route::post('/checkout', [CheckoutController::class, 'process'])->name('public.checkout.process');
 Route::get('/checkout/success/{nomor}', [CheckoutController::class, 'success'])->name('public.checkout.success');
 
-// Ulasan Pembeli
-Route::post('/rating', [RatingController::class, 'store'])->name('public.rating.store');
-
-// Lacak Pesanan
+// Lacak Pesanan & Ulasan Pembeli
 Route::get('/lacak-pesanan', [CheckoutController::class, 'track'])->name('public.track');
+Route::post('/rating', [RatingController::class, 'store'])->name('public.rating.store');
 
 // ===== AUTH (Breeze) =====
 require __DIR__.'/auth.php';
 
-// ===== DASHBOARD =====
+// ===== DASHBOARD (AUTH & ROLE) =====
 Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard redirector (Admin & Kasir)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ===== ADMIN =====
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
-        // Profil
+        
+        // Profil Pasar
         Route::get('/profil', [\App\Http\Controllers\Admin\ProfilPasarController::class, 'index'])->name('profil.index');
         Route::put('/profil', [\App\Http\Controllers\Admin\ProfilPasarController::class, 'update'])->name('profil.update');
         
@@ -54,16 +55,30 @@ Route::middleware(['auth'])->group(function () {
         // Produk
         Route::resource('/produk', \App\Http\Controllers\Admin\ProdukController::class);
 
-        // Pesanan
+        // Supplier (BARU)
+        Route::get('/supplier', [\App\Http\Controllers\Admin\SupplierController::class, 'index'])->name('supplier.index');
+        Route::post('/supplier', [\App\Http\Controllers\Admin\SupplierController::class, 'store'])->name('supplier.store');
+        Route::put('/supplier/{supplier}', [\App\Http\Controllers\Admin\SupplierController::class, 'update'])->name('supplier.update');
+        Route::delete('/supplier/{supplier}', [\App\Http\Controllers\Admin\SupplierController::class, 'destroy'])->name('supplier.destroy');
+
+        // Stok Masuk (BARU)
+        Route::get('/stok', [\App\Http\Controllers\Admin\StokMasukController::class, 'index'])->name('stok.index');
+        Route::get('/stok/create', [\App\Http\Controllers\Admin\StokMasukController::class, 'create'])->name('stok.create');
+        Route::post('/stok', [\App\Http\Controllers\Admin\StokMasukController::class, 'store'])->name('stok.store');
+        Route::get('/stok/{stok}', [\App\Http\Controllers\Admin\StokMasukController::class, 'show'])->name('stok.show');
+
+        // Pesanan Online
         Route::get('/pesanan', [\App\Http\Controllers\Admin\PesananController::class, 'index'])->name('pesanan.index');
         Route::get('/pesanan/{pesanan}', [\App\Http\Controllers\Admin\PesananController::class, 'show'])->name('pesanan.show');
         Route::put('/pesanan/{pesanan}/status', [\App\Http\Controllers\Admin\PesananController::class, 'updateStatus'])->name('pesanan.status');
 
-        // Transaksi
+        // Semua Transaksi
         Route::get('/transaksi', [\App\Http\Controllers\Admin\TransaksiController::class, 'index'])->name('transaksi.index');
+        Route::post('/transaksi/{transaksi}/void', [\App\Http\Controllers\Admin\TransaksiController::class, 'void'])->name('transaksi.void');
 
         // Laporan
         Route::get('/laporan', [\App\Http\Controllers\Admin\LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('/laporan/export-excel', [\App\Http\Controllers\Admin\LaporanController::class, 'exportExcel'])->name('laporan.excel');
 
         // Ulasan
         Route::get('/ulasan', [\App\Http\Controllers\Admin\UlasanController::class, 'index'])->name('ulasan.index');
@@ -76,18 +91,22 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/user/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('user.update');
         Route::delete('/user/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('user.destroy');
 
-        // QR Code & Placeholder
+        // QR Code
         Route::get('/qrcode', [\App\Http\Controllers\Admin\PengaturanController::class, 'qrCode'])->name('qrcode');
-        Route::view('/supplier', 'admin.placeholder', ['title' => 'Supplier'])->name('supplier.index');
-        Route::view('/stok', 'admin.placeholder', ['title' => 'Stok Masuk'])->name('stok.index');
     });
 
     // ===== KASIR =====
     Route::middleware(['role:kasir'])->prefix('kasir')->name('kasir.')->group(function () {
+        
+        // POS (Point of Sale)
         Route::get('/pos', [\App\Http\Controllers\Kasir\PosController::class, 'index'])->name('pos');
         Route::post('/pos', [\App\Http\Controllers\Kasir\PosController::class, 'store'])->name('pos.store');
         Route::get('/pos/struk/{transaksi}', [\App\Http\Controllers\Kasir\PosController::class, 'struk'])->name('pos.struk');
+        
+        // Riwayat Transaksi Kasir
         Route::get('/transaksi', [\App\Http\Controllers\Kasir\TransaksiController::class, 'index'])->name('transaksi');
+        
+        // Pelanggan (Placeholder sementara)
         Route::view('/pelanggan', 'admin.placeholder', ['title' => 'Pelanggan'])->name('pelanggan');
     });
 });

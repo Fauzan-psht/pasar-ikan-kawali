@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\ProfilPasar;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,6 +16,21 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertStatus(200);
+    }
+
+    public function test_login_screen_uses_the_market_profile_branding(): void
+    {
+        $profil = ProfilPasar::current();
+        $profil->update([
+            'nama' => 'Pasar Contoh',
+            'logo' => 'profil/logo-contoh.webp',
+        ]);
+
+        $response = $this->get('/login');
+
+        $response->assertStatus(200)
+            ->assertSee('Pasar Contoh')
+            ->assertSee(asset('storage/profil/logo-contoh.webp'));
     }
 
     public function test_users_can_authenticate_using_the_login_screen(): void

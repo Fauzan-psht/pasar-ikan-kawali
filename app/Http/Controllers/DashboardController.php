@@ -23,6 +23,7 @@ class DashboardController extends Controller
         }
 
         auth()->logout();
+
         return redirect()->route('login')->withErrors(['email' => 'Role akun tidak valid.']);
     }
 
@@ -43,7 +44,7 @@ class DashboardController extends Controller
         $stokMenipis = Produk::whereColumn('stok', '<=', 'stok_minimum')->where('status', 1)->count();
         $totalUser = User::where('is_active', 1)->count();
 
-        $transaksiTerbaru = Transaksi::with(['user', 'pelanggan'])->latest()->take(8)->get();
+        $transaksiTerbaru = Transaksi::with(['user', 'pelanggan'])->latest()->take(10)->get();
         $pesananTerbaru = Pesanan::latest()->take(5)->get();
 
         return view('admin.dashboard', compact(

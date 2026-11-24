@@ -33,8 +33,8 @@
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-semibold">Tipe Produk <span class="text-danger">*</span></label>
                     <select name="tipe_produk" class="form-select" required>
-                        <option value="konsumsi" {{ (old('tipe_produk', $produk->tipe_produk ?? '') == 'konsumsi') ? 'selected' : '' }}>Konsumsi (Ikan Hidup/Matang)</option>
-                        <option value="benih" {{ (old('tipe_produk', $produk->tipe_produk ?? '') == 'benih') ? 'selected' : '' }}>Benih (Bibit Ikan)</option>
+                        <option value="konsumsi" {{ (old('tipe_produk', $produk->tipe_produk ?? '') == 'konsumsi') ? 'selected' : '' }}>Ikan Konsumsi</option>
+                        <option value="benih" {{ (old('tipe_produk', $produk->tipe_produk ?? '') == 'benih') ? 'selected' : '' }}>Benih Ikan</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -43,6 +43,7 @@
                         <option value="kg" {{ (old('satuan', $produk->satuan ?? '') == 'kg') ? 'selected' : '' }}>Kilogram (kg)</option>
                         <option value="ekor" {{ (old('satuan', $produk->satuan ?? '') == 'ekor') ? 'selected' : '' }}>Ekor</option>
                     </select>
+                    <small class="text-muted">Bisa pilih kg atau ekor untuk benih.</small>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label fw-semibold">Harga Jual (Rp) <span class="text-danger">*</span></label>

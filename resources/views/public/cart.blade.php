@@ -15,6 +15,7 @@
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+        <div id="cart-update-error" class="alert alert-danger d-none" role="alert" aria-live="polite"></div>
 
         @if(count($cart) > 0)
         <div class="row g-4">
@@ -48,7 +49,7 @@
                                     </td>
                                     <td data-label="Harga">Rp {{ number_format($details['harga'], 0, ',', '.') }}</td>
                                     <td data-label="Jumlah">
-                                        <input type="number" class="form-control form-control-sm update-cart" data-id="{{ $id }}" value="{{ $details['qty'] }}" min="0.1" step="0.1" aria-label="Jumlah {{ $details['nama'] }}">
+                                        <input type="number" class="form-control form-control-sm update-cart" data-id="{{ $id }}" data-original-value="{{ $details['qty'] }}" value="{{ $details['qty'] }}" min="{{ ($details['satuan'] ?? 'kg') === 'kg' ? '0.5' : '1' }}" step="{{ ($details['satuan'] ?? 'kg') === 'kg' ? '0.1' : '1' }}" aria-label="Jumlah {{ $details['nama'] }}">
                                     </td>
                                     <td data-label="Subtotal" class="fw-bold">Rp {{ number_format($details['harga'] * $details['qty'], 0, ',', '.') }}</td>
                                     <td data-label="Hapus">
@@ -69,7 +70,7 @@
                         <span class="fw-bold fs-5 text-primary">Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
                     <a href="{{ route('public.checkout') }}" class="btn btn-hero-primary w-100 py-2">
-                        Lanjut ke Checkout <i class="bi bi-arrow-right ms-1"></i>
+                        Lanjut ke Checkout
                     </a>
                     <a href="{{ route('public.katalog') }}" class="btn btn-outline-secondary w-100 py-2 mt-2">Lanjut Belanja</a>
                 </div>
@@ -121,16 +122,38 @@
 <script>
     document.querySelectorAll('.update-cart').forEach(input => {
         input.addEventListener('change', function() {
-            let id = this.getAttribute('data-id');
-            let qty = this.value;
+            const inputElement = this;
+            const id = inputElement.getAttribute('data-id');
+            const qty = inputElement.value;
+            const errorElement = document.getElementById('cart-update-error');
+
             fetch('{{ route("public.cart.update") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({ id: id, qty: qty })
-            }).then(() => window.location.reload());
+            }).then(async response => {
+                if (!response.ok) {
+                    const result = await response.json();
+                    const message = result.errors && result.errors.qty
+                        ? result.errors.qty[0]
+                        : (result.message || 'Jumlah keranjang tidak dapat diperbarui.');
+
+                    errorElement.textContent = message;
+                    errorElement.classList.remove('d-none');
+                    inputElement.value = inputElement.dataset.originalValue;
+                    return;
+                }
+
+                window.location.reload();
+            }).catch(() => {
+                errorElement.textContent = 'Jumlah keranjang gagal diperbarui. Periksa koneksi Anda dan coba lagi.';
+                errorElement.classList.remove('d-none');
+                inputElement.value = inputElement.dataset.originalValue;
+            });
         });
     });
 

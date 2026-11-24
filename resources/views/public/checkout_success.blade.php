@@ -14,21 +14,24 @@
         <div class="d-inline-block p-4 rounded border bg-white text-start mb-4" style="min-width: 300px;">
             <div class="mb-2"><span class="text-muted">No. Pesanan:</span> <br><strong class="fs-5">{{ $pesanan->nomor }}</strong></div>
             <div class="mb-2"><span class="text-muted">Total Belanja:</span> <br><strong class="fs-5 text-primary">Rp {{ number_format($pesanan->total, 0, ',', '.') }}</strong></div>
-            <div><span class="text-muted">Status:</span> <br>
+            <div><span class="text-muted">Status Pembayaran:</span> <br>
                 @if($pesanan->status === 'confirmed')
-                    <span class="badge bg-success">Dikonfirmasi (Bayar di Tempat)</span>
+                    <span class="badge bg-success">Lunas / Bayar di Tempat</span>
                 @else
-                    <span class="badge bg-warning text-dark">Menunggu Pembayaran Transfer</span>
+                    <span class="badge bg-warning text-dark">Menunggu Pembayaran</span>
                 @endif
             </div>
         </div>
         
         <div class="alert alert-info mx-auto" style="max-width: 500px;">
-            <i class="bi bi-info-circle me-2"></i> Silakan simpan nomor pesanan ini. Anda dapat mengecek status pesanan dengan menghubungi WhatsApp Pasar Ikan Kawali.
+            <i class="bi bi-info-circle me-2"></i> Silakan simpan nomor pesanan ini. Anda dapat mengecek status pesanan kapan saja melalui menu <strong>Lacak Pesanan</strong> di website.
         </div>
 
         <div class="mt-4 mb-5">
             <a href="{{ route('public.home') }}" class="btn btn-hero-primary">Kembali ke Beranda</a>
+            @if(session('snap_token'))
+                <button class="btn btn-warning ms-2" onclick="payNow()">Bayar Sekarang</button>
+            @endif
         </div>
 
         {{-- FORM ULASAN --}}
@@ -70,3 +73,37 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+{{-- Script Midtrans Snap --}}
+@if(session('snap_token'))
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+<script type="text/javascript">
+    // Fungsi untuk memanggil popup Midtrans
+    function payNow() {
+        snap.pay('{{ session('snap_token') }}', {
+            onSuccess: function(result){
+                alert("Pembayaran berhasil!");
+                window.location.reload();
+            },
+            onPending: function(result){
+                alert("Menunggu pembayaran Anda.");
+                window.location.reload();
+            },
+            onError: function(result){
+                alert("Pembayaran gagal!");
+                window.location.reload();
+            },
+            onClose: function(){
+                alert('Anda menutup popup tanpa menyelesaikan pembayaran.');
+            }
+        });
+    }
+
+    // Otomatis munculkan popup saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        payNow();
+    });
+</script>
+@endif
+@endpush

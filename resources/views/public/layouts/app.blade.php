@@ -1,11 +1,14 @@
 @php $profil = \App\Models\ProfilPasar::current(); @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', $profil->nama) — {{ $profil->nama }}</title>
     <meta name="description" content="@yield('meta_description', $profil->deskripsi)">
+    <script>
+        document.documentElement.dataset.theme = localStorage.getItem('visitor-theme') === 'dark' ? 'dark' : 'light';
+    </script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -27,9 +30,28 @@
             --gray-100: #F1F5F9;
             --gray-700: #334155;
             --gray-900: #0F172A;
+            --public-surface: #fff;
+            --public-border: #E2E8F0;
+            --public-muted: #64748B;
+        }
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --gray-50: #0B1220;
+            --gray-100: #1E293B;
+            --gray-700: #CBD5E1;
+            --gray-900: #F1F5F9;
+            --public-surface: #111827;
+            --public-border: #334155;
+            --public-muted: #94A3B8;
+            --bs-body-color: #F1F5F9;
+            --bs-body-bg: #0B1220;
+            --bs-secondary-color: #94A3B8;
+            --bs-border-color: #334155;
+            --bs-tertiary-bg: #1E293B;
+            --bs-emphasis-color: #F8FAFC;
         }
         * { scroll-behavior: smooth; }
-        body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); overflow-x: hidden; transition: background-color 0.2s ease, color 0.2s ease; }
         h1, h2, h3, h4, h5, h6, .navbar-brand { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
 
         .navbar-custom { background: rgba(10, 37, 64, 0.95); backdrop-filter: blur(12px); padding: 0.9rem 0; transition: all 0.3s ease; box-shadow: 0 2px 24px rgba(10, 37, 64, 0.15); }
@@ -40,8 +62,8 @@
         .navbar-custom .nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 500; padding: 0.5rem 1rem !important; font-size: 0.95rem; transition: color 0.2s ease; position: relative; }
         .navbar-custom .nav-link:hover, .navbar-custom .nav-link.active { color: #fff !important; }
         .navbar-custom .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 1rem; right: 1rem; height: 2px; background: linear-gradient(90deg, var(--accent-teal), var(--accent-cyan)); border-radius: 2px; }
-        .btn-nav-login { background: linear-gradient(135deg, var(--accent-teal), var(--accent-cyan)); border: none; color: #fff; font-weight: 600; padding: 0.55rem 1.4rem; border-radius: 8px; transition: all 0.3s ease; }
-        .btn-nav-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4); color: #fff; }
+        .theme-toggle { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.35); border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; font-size: 1.1rem; transition: background-color 0.2s ease, transform 0.2s ease; }
+        .theme-toggle:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
 
         .hero { background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 45%, var(--primary-500) 100%); color: #fff; padding: 9rem 0 6rem; position: relative; overflow: hidden; }
         .hero.has-banner { background-image: linear-gradient(135deg, rgba(10,37,64,0.9), rgba(20,83,143,0.78) 55%, rgba(46,134,222,0.68)), var(--hero-banner); background-size: cover; background-position: center; }
@@ -63,7 +85,7 @@
         .section-title h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); color: var(--primary-900); margin-bottom: 0.8rem; }
         .section-title p { color: var(--gray-700); max-width: 620px; margin: 0 auto; }
 
-        .card-modern { background: #fff; border-radius: 16px; border: 1px solid var(--gray-100); overflow: hidden; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        .card-modern { background: var(--public-surface); border-radius: 16px; border: 1px solid var(--public-border); overflow: hidden; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
         .card-modern:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(10,37,64,0.12); border-color: rgba(46,134,222,0.2); }
         .card-modern .card-img { height: 200px; background: linear-gradient(135deg, var(--primary-700), var(--primary-500)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 3rem; position: relative; overflow: hidden; }
         .card-modern .card-img img { width: 100%; height: 100%; object-fit: cover; }
@@ -97,8 +119,68 @@
         .maps-wrapper iframe { display: block; width: 100%; min-height: 350px; border: 0; }
         .stars { color: var(--accent-gold); }
 
+        [data-theme="dark"] .section-title h2,
+        [data-theme="dark"] .card-modern h2,
+        [data-theme="dark"] .card-modern h3,
+        [data-theme="dark"] .card-modern h4,
+        [data-theme="dark"] .card-modern h5,
+        [data-theme="dark"] .card-modern h6,
+        [data-theme="dark"] .card-modern .card-title {
+            color: var(--gray-900) !important;
+        }
+        [data-theme="dark"] .card-modern [style*="color:var(--primary-900)"] { color: var(--gray-900) !important; }
+        [data-theme="dark"] .card-modern .btn-detail { background: var(--gray-100); color: var(--gray-900); }
+        [data-theme="dark"] .card-modern .btn-detail:hover { background: linear-gradient(135deg, var(--primary-600), var(--primary-500)); color: #fff; }
+        [data-theme="dark"] .text-muted { color: var(--public-muted) !important; }
+        [data-theme="dark"] .bg-white,
+        [data-theme="dark"] .card,
+        [data-theme="dark"] .panel {
+            background-color: var(--public-surface) !important;
+            color: var(--gray-900);
+            border-color: var(--public-border) !important;
+        }
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select,
+        [data-theme="dark"] textarea {
+            background-color: #0B1220;
+            color: var(--gray-900);
+            border-color: var(--public-border);
+        }
+        [data-theme="dark"] .form-control::placeholder,
+        [data-theme="dark"] textarea::placeholder { color: var(--public-muted); }
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus,
+        [data-theme="dark"] textarea:focus {
+            background-color: #0B1220;
+            color: var(--gray-900);
+            border-color: var(--accent-teal);
+        }
+        [data-theme="dark"] .form-check-input { background-color: #0B1220; border-color: #64748B; }
+        [data-theme="dark"] .form-check-input:checked { background-color: var(--accent-teal); border-color: var(--accent-teal); }
+        [data-theme="dark"] .table {
+            --bs-table-bg: var(--public-surface);
+            --bs-table-color: var(--gray-900);
+            --bs-table-border-color: var(--public-border);
+            --bs-table-striped-bg: #172033;
+            --bs-table-striped-color: var(--gray-900);
+            --bs-table-hover-bg: #1E293B;
+            --bs-table-hover-color: var(--gray-900);
+        }
+        [data-theme="dark"] .list-group-item { background-color: var(--public-surface); color: var(--gray-900); border-color: var(--public-border); }
+        [data-theme="dark"] .border,
+        [data-theme="dark"] .border-top,
+        [data-theme="dark"] .border-bottom,
+        [data-theme="dark"] hr { border-color: var(--public-border) !important; }
+        [data-theme="dark"] .btn-outline-secondary { color: #CBD5E1; border-color: #64748B; }
+        [data-theme="dark"] .btn-outline-secondary:hover { color: #fff; background-color: #334155; }
+
         .mobile-bottom-nav { display: none; }
-        .btn-nav-login { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+        [data-theme="dark"] .mobile-bottom-nav {
+            background: rgba(17, 24, 39, 0.97);
+            border-color: var(--public-border);
+        }
+        [data-theme="dark"] .mobile-bottom-nav a { color: #94A3B8; }
+        [data-theme="dark"] .mobile-bottom-nav a.active { color: #67E8D2; }
 
         @media (max-width: 991.98px) {
             .navbar-custom .navbar-collapse {
@@ -110,7 +192,6 @@
             .navbar-custom .navbar-nav { align-items: stretch !important; }
             .navbar-custom .nav-link { padding: 0.75rem 0.25rem !important; }
             .navbar-custom .nav-link.active::after { left: 0.25rem; right: auto; width: 2rem; }
-            .btn-nav-login { margin-top: 0.5rem; min-height: 44px; }
         }
 
         @media (max-width: 767.98px) {
@@ -119,6 +200,7 @@
             .navbar-custom .navbar-brand { gap: 0.45rem; font-size: 1.05rem; }
             .navbar-custom .navbar-brand .brand-icon { width: 34px; height: 34px; font-size: 1.05rem; }
             .navbar-custom .navbar-brand .brand-logo { width: 34px; height: 34px; flex-basis: 34px; }
+            .theme-toggle { width: 36px; height: 36px; }
             .hero { padding: 6.5rem 0 3.5rem; }
             .hero::after { height: 42px; }
             .hero h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
@@ -209,6 +291,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    const publicThemeToggle = document.getElementById('publicThemeToggle');
+
+    if (publicThemeToggle) {
+        const updatePublicThemeToggle = () => {
+            const isDark = document.documentElement.dataset.theme === 'dark';
+
+            publicThemeToggle.setAttribute('aria-pressed', String(isDark));
+            publicThemeToggle.setAttribute('aria-label', isDark ? 'Gunakan tema terang' : 'Gunakan tema gelap');
+            publicThemeToggle.innerHTML = isDark
+                ? '<i class="bi bi-sun" aria-hidden="true"></i>'
+                : '<i class="bi bi-moon-stars" aria-hidden="true"></i>';
+        };
+
+        updatePublicThemeToggle();
+        publicThemeToggle.addEventListener('click', () => {
+            const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.dataset.theme = theme;
+            localStorage.setItem('visitor-theme', theme);
+            updatePublicThemeToggle();
+        });
+    }
+
     window.addEventListener('scroll', () => {
         const nav = document.querySelector('.navbar-custom');
         if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);

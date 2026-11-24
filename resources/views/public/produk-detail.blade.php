@@ -22,6 +22,9 @@
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+        @error('qty')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
 
         <div class="row g-4">
             <div class="col-lg-5">
@@ -52,22 +55,22 @@
                     </div>
                     <hr>
 
-                    @if($produk->stok > 0)
+                    @if($produk->stok >= $produk->minimumOrderQuantity())
                     <form action="{{ route('public.cart.add') }}" method="POST" class="mt-3">
                         @csrf
                         <input type="hidden" name="produk_id" value="{{ $produk->id }}">
                         <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-end mb-3">
-                                <div class="product-quantity">
+                            <div class="product-quantity">
                                 <label class="form-label fw-semibold small">Jumlah ({{ $produk->satuan }})</label>
-                                <input type="number" name="qty" class="form-control" value="1" min="{{ $produk->satuan === 'kg' ? '0.1' : '1' }}" step="{{ $produk->satuan === 'kg' ? '0.1' : '1' }}" max="{{ $produk->stok }}" required>
+                                <input type="number" name="qty" class="form-control" value="{{ $produk->minimumOrderQuantity() }}" min="{{ $produk->minimumOrderQuantity() }}" step="{{ $produk->satuan === 'kg' ? '0.1' : '1' }}" max="{{ $produk->stok }}" required>
                             </div>
-                                <button type="submit" class="btn btn-hero-primary flex-grow-1 product-add-button">
+                            <button type="submit" class="btn btn-hero-primary flex-grow-1 product-add-button">
                                 <i class="bi bi-cart-plus me-2"></i> Tambah ke Keranjang
                             </button>
                         </div>
                     </form>
                     @else
-                        <div class="alert alert-warning">Stok habis.</div>
+                        <div class="alert alert-warning">Stok tidak mencukupi jumlah minimum pembelian.</div>
                     @endif
                 </div>
             </div>

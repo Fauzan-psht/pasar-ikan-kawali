@@ -42,13 +42,11 @@
                         @endif
                     </a>
                 </li>
-                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                    <a href="{{ route('login') }}" class="btn-nav-login">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                    </a>
-                </li>
             </ul>
         </div>
+        <button type="button" class="theme-toggle ms-auto ms-lg-3" id="publicThemeToggle" aria-label="Gunakan tema gelap" aria-pressed="false">
+            <i class="bi bi-moon-stars" aria-hidden="true"></i>
+        </button>
     </div>
 </nav>
 

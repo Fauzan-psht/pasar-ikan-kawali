@@ -19,26 +19,6 @@
     .total-row { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 800; color: var(--primary-900); margin-bottom: 1rem; }
     
     .qty-input { width: 60px; text-align: center; }
-
-    @media (max-width: 991px) {
-        .pos-container { height: auto; min-height: 0; flex-direction: column; }
-        .pos-products { overflow: visible; }
-        .pos-cart { width: 100%; min-height: 440px; }
-        .pos-cart .cart-items { min-height: 130px; max-height: 30vh; }
-        .pos-cart .cart-summary { position: sticky; bottom: 0; z-index: 2; }
-        .pos-cart .total-row { font-size: 1.05rem; }
-        .pos-cart #btnCheckout { min-height: 50px; }
-    }
-
-    @media (max-width: 575.98px) {
-        .pos-products .product-item { width: 50%; }
-        .pos-products .product-card { min-height: 160px; }
-        .pos-products .product-card .card-body { padding: 0.6rem; }
-    }
-
-    @media (min-width: 576px) and (max-width: 991.98px) {
-        .pos-products .product-item { width: 33.333333%; }
-    }
 </style>
 @endpush
 
@@ -52,9 +32,9 @@
         <div class="row g-2" id="productList">
             @foreach($produks as $p)
             <div class="col-md-4 col-xl-3 product-item" data-name="{{ strtolower($p->nama) }}">
-                <div class="card h-100 product-card border" role="button" tabindex="0" onclick="addToCart({{ $p->id }}, '{{ addslashes($p->nama) }}', {{ $p->harga_jual }}, '{{ $p->satuan }}', {{ $p->stok }})" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();this.click();}">
+                <div class="card h-100 product-card border" onclick="addToCart({{ $p->id }}, '{{ addslashes($p->nama) }}', {{ $p->harga_jual }}, '{{ $p->satuan }}', {{ $p->stok }})">
                     @if($p->foto)
-                        <img src="{{ asset('storage/'.$p->foto) }}" alt="{{ $p->nama }}" class="card-img-top" style="height: 100px; object-fit: cover;">
+                        <img src="{{ asset('storage/'.$p->foto) }}" class="card-img-top" style="height: 100px; object-fit: cover;">
                     @else
                         <div class="bg-light d-flex align-items-center justify-content-center" style="height: 100px;"><i class="bi bi-fish fs-1 text-muted"></i></div>
                     @endif
@@ -72,7 +52,15 @@
     <!-- KANAN: Keranjang -->
     <div class="pos-cart">
         <div class="p-3 border-bottom bg-white" style="border-radius: 14px 14px 0 0;">
-            <h5 class="m-0 fw-bold"><i class="bi bi-cart3 me-2"></i> Keranjang</h5>
+            <h5 class="m-0 fw-bold mb-3"><i class="bi bi-cart3 me-2"></i> Keranjang</h5>
+            
+            <!-- Dropdown Pelanggan -->
+            <select id="selectPelanggan" class="form-select form-select-sm js-select2">
+                <option value="">-- Pelanggan Umum (Guest) --</option>
+                @foreach($pelanggans as $p)
+                    <option value="{{ $p->id }}">{{ $p->nama }} ({{ $p->telepon ?? 'Tanpa No HP' }})</option>
+                @endforeach
+            </select>
         </div>
         
         <div class="cart-items" id="cartItems">
@@ -153,7 +141,6 @@
     // Render Tampilan Keranjang
     function renderCart() {
         const container = document.getElementById('cartItems');
-        const emptyMsg = document.getElementById('emptyCart');
         const btnCheckout = document.getElementById('btnCheckout');
         
         container.innerHTML = '';
@@ -163,7 +150,6 @@
             container.innerHTML = `<div class="text-center text-muted mt-5" id="emptyCart"><i class="bi bi-basket fs-1 d-block mb-2"></i>Keranjang masih kosong</div>`;
             btnCheckout.disabled = true;
         } else {
-            container.innerHTML = ''; // clear empty msg
             cart.forEach(item => {
                 total += item.harga * item.qty;
                 const html = `
@@ -231,7 +217,8 @@
             },
             body: JSON.stringify({
                 items: cart,
-                bayar: bayar
+                bayar: bayar,
+                pelanggan_id: document.getElementById('selectPelanggan').value
             })
         })
         .then(res => res.json())

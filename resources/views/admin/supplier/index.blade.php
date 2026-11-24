@@ -46,7 +46,7 @@
                             </td>
                             <td class="text-center">
                                 <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ $s->id }}"><i class="bi bi-pencil"></i></button>
-                                <form action="{{ route('admin.supplier.destroy', $s->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus supplier?')">
+                                <form action="{{ route('admin.supplier.destroy', $s->id) }}" method="POST" class="d-inline" data-confirm="Hapus supplier?" data-confirm-button="Ya, Hapus!">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                                 </form>

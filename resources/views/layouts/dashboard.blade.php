@@ -1,10 +1,11 @@
+@php($profil = \App\Models\ProfilPasar::current())
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- PENTING UNTUK AJAX/FETCH POS -->
-    <title>@yield('title', 'Dashboard') — {{ \App\Models\ProfilPasar::current()->nama }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Dashboard') — {{ $profil->nama }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -62,6 +63,14 @@
             justify-content: center;
             font-size: 1.3rem;
             color: #fff;
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-logo {
+            width: 40px; height: 40px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 10px;
+            padding: 3px;
             flex-shrink: 0;
         }
         .sidebar-brand .brand-text { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.2; }
@@ -225,61 +234,60 @@
         .badge-soft.danger  { background: rgba(239,68,68,0.12); color: #b91c1c; }
         .badge-soft.info    { background: rgba(46,134,222,0.12); color: var(--primary-600); }
 
+        /* ===== LOADING OVERLAY ===== */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .spinner-custom {
+            width: 4rem; height: 4rem;
+            color: var(--primary-600);
+            border-width: 0.3em;
+        }
+        .loading-text {
+            margin-top: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-800);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.1em;
+            font-size: 1.1rem;
+        }
+
         /* Mobile */
         .sidebar-toggle { display: none; }
-        .sidebar-backdrop { display: none; }
         @media (max-width: 991px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.show { transform: translateX(0); }
             .main-wrapper { margin-left: 0; }
             .sidebar-toggle { display: inline-flex; }
-            .sidebar-backdrop.show {
-                display: block;
-                position: fixed;
-                inset: 0;
-                z-index: 1035;
-                width: 100%;
-                height: 100%;
-                border: 0;
-                background: rgba(15, 23, 42, 0.48);
-            }
-            .topbar { padding: 0.75rem 1rem; }
-            .topbar h5 { max-width: 50vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1rem; }
-            .content-area { padding: 1rem; }
-            .content-area > .d-flex.justify-content-between { flex-wrap: wrap; gap: 0.75rem; }
-            .content-area > .d-flex.justify-content-between > form { flex: 1 1 100%; }
-            .content-area > .d-flex.justify-content-between > form .form-control { min-width: 0; }
-            .panel { padding: 1rem; }
-            .table-responsive { -webkit-overflow-scrolling: touch; }
-            .table-responsive > .table { min-width: 620px; }
-            .stat-card { padding: 1rem; }
-            .stat-card .stat-value { font-size: clamp(1.15rem, 5vw, 1.5rem); overflow-wrap: anywhere; }
-            .btn, .form-control, .form-select { min-height: 42px; }
-            .modal-dialog { margin: 0.75rem; }
-        }
-        @media (max-width: 575.98px) {
-            .sidebar { width: min(290px, 86vw); }
-            .topbar { gap: 0.5rem; }
-            .topbar > .d-flex { min-width: 0; gap: 0.5rem !important; }
-            .topbar .user-info { gap: 0.4rem; }
-            .topbar .avatar { width: 34px; height: 34px; }
-            .content-area { padding: 0.75rem; }
-            .content-area > .d-flex.justify-content-between > form { width: 100%; }
-            .panel { padding: 0.85rem; border-radius: 12px; }
         }
     </style>
     @stack('styles')
 </head>
 <body>
 
+{{-- LOADING OVERLAY --}}
+<div id="loading-overlay">
+    <div class="spinner-border spinner-custom" role="status"></div>
+    <div class="loading-text">MEMPROSES DATA...</div>
+</div>
+
 {{-- SIDEBAR --}}
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
-        <span class="brand-icon"><i class="bi bi-fish"></i></span>
-        <span class="brand-text">
-            Pasar Ikan
-            <small>Kawali</small>
-        </span>
+        @if($profil->logo)
+            <img class="brand-logo" src="{{ asset('storage/'.$profil->logo) }}" alt="Logo {{ $profil->nama }}">
+        @else
+            <span class="brand-icon"><i class="bi bi-fish"></i></span>
+        @endif
+        <span class="brand-text">{{ $profil->nama }}</span>
     </a>
 
     <ul class="sidebar-menu">
@@ -306,6 +314,10 @@
             <li><a href="{{ route('admin.ulasan.index') }}" class="{{ request()->routeIs('admin.ulasan*') ? 'active' : '' }}"><i class="bi bi-star"></i> Ulasan</a></li>
             <li><a href="{{ route('admin.user.index') }}" class="{{ request()->routeIs('admin.user*') ? 'active' : '' }}"><i class="bi bi-people"></i> User</a></li>
             <li><a href="{{ route('admin.qrcode') }}" class="{{ request()->routeIs('admin.qrcode') ? 'active' : '' }}"><i class="bi bi-qr-code"></i> QR Code Web</a></li>
+
+            <li class="menu-label">Sistem & Data</li>
+            <li><a href="{{ route('admin.pelanggan.index') }}" class="{{ request()->routeIs('admin.pelanggan*') ? 'active' : '' }}"><i class="bi bi-person-lines-fill"></i> Pelanggan</a></li>
+            <li><a href="{{ route('admin.log.index') }}" class="{{ request()->routeIs('admin.log*') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Log Aktivitas</a></li>
         @endif
 
         @if(auth()->user()->isKasir())
@@ -321,7 +333,7 @@
 <div class="main-wrapper">
     <div class="topbar">
         <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-sm btn-light sidebar-toggle" type="button" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" onclick="toggleDashboardSidebar()">
+            <button class="btn btn-sm btn-light sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('show')">
                 <i class="bi bi-list"></i>
             </button>
             <h5>@yield('page_title', 'Dashboard')</h5>
@@ -332,9 +344,9 @@
                 <div class="role">{{ auth()->user()->role }}</div>
             </div>
             <div class="avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-            <form action="{{ route('logout') }}" method="POST" class="m-0">
+            <form action="{{ route('logout') }}" method="POST" class="m-0" id="logoutForm">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-outline-danger" title="Logout">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmLogout()" title="Logout">
                     <i class="bi bi-box-arrow-right"></i>
                 </button>
             </form>
@@ -359,42 +371,84 @@
     </div>
 </div>
 
-<button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Tutup menu" onclick="closeDashboardSidebar()"></button>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    function toggleDashboardSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const toggle = document.querySelector('.sidebar-toggle');
-        const isOpen = sidebar.classList.toggle('show');
+    // 1. Konfirmasi Hapus (Form dengan atribut data-confirm)
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForms = document.querySelectorAll('form[data-confirm]');
+        
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const message = this.getAttribute('data-confirm') || 'Apakah Anda yakin ingin menghapus data ini?';
+                
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showLoading();
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
 
-        backdrop.classList.toggle('show', isOpen);
-        toggle.setAttribute('aria-expanded', String(isOpen));
+    // 2. Tampilkan Loading saat form POST biasa disubmit
+    document.addEventListener('DOMContentLoaded', function() {
+        const allForms = document.querySelectorAll('form:not([data-confirm])');
+        allForms.forEach(form => {
+            if(form.id !== 'logoutForm' && form.method.toUpperCase() === 'POST') {
+                form.addEventListener('submit', function() {
+                    showLoading();
+                });
+            }
+        });
+    });
+
+    // 3. Fungsi Loading Overlay
+    function showLoading() {
+        document.getElementById('loading-overlay').style.display = 'flex';
     }
 
-    function closeDashboardSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const toggle = document.querySelector('.sidebar-toggle');
-
-        sidebar.classList.remove('show');
-        backdrop.classList.remove('show');
-        toggle.setAttribute('aria-expanded', 'false');
+    // 4. Logout dengan SweetAlert
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Logout?',
+            text: "Anda akan keluar dari sistem.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Logout',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+                document.getElementById('logoutForm').submit();
+            }
+        });
     }
 
-    document.querySelectorAll('#sidebar a').forEach(link => {
-        link.addEventListener('click', closeDashboardSidebar);
-    });
-
-    document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') closeDashboardSidebar();
-    });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 991) closeDashboardSidebar();
-    });
+    // 5. Auto Close Alert setelah 3 detik
+    setTimeout(() => {
+        let alerts = document.querySelectorAll('.alert-dismissible');
+        alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 3000);
 </script>
+
 @stack('scripts')
 </body>
 </html>

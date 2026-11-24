@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Kasir;
 
 use App\Http\Controllers\Controller;
-use App\Models\Produk;
-use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
+use App\Models\Pelanggan;
+use App\Models\Produk;
 use App\Models\StokMovement;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,9 @@ class PosController extends Controller
     {
         // Ambil semua produk yang aktif dan stoknya > 0
         $produks = Produk::aktif()->where('stok', '>', 0)->with('kategori')->get();
-        return view('kasir.pos.index', compact('produks'));
+        $pelanggans = Pelanggan::orderBy('nama')->get(); // Tambahan Pelanggan
+
+        return view('kasir.pos.index', compact('produks', 'pelanggans'));
     }
 
     public function store(Request $request)
@@ -26,6 +29,7 @@ class PosController extends Controller
             'items.*.id' => 'required|exists:produks,id',
             'items.*.qty' => 'required|numeric|min:0.1',
             'bayar' => 'required|numeric|min:0',
+            'pelanggan_id' => 'nullable|exists:pelanggans,id', // Validasi Pelanggan
         ]);
 
         try {
@@ -37,7 +41,7 @@ class PosController extends Controller
             // 1. Validasi stok & hitung total
             foreach ($request->items as $item) {
                 $produk = Produk::lockForUpdate()->find($item['id']);
-                
+
                 if ($produk->stok < $item['qty']) {
                     throw new \Exception("Stok {$produk->nama} tidak mencukupi. Sisa: {$produk->stok}");
                 }
@@ -60,13 +64,14 @@ class PosController extends Controller
 
             // Cek uang bayar
             if ($request->bayar < $total) {
-                throw new \Exception("Uang bayar kurang dari total tagihan.");
+                throw new \Exception('Uang bayar kurang dari total tagihan.');
             }
 
             // 2. Buat Header Transaksi
             $transaksi = Transaksi::create([
                 'nomor' => Transaksi::generateNomor(),
                 'user_id' => auth()->id(),
+                'pelanggan_id' => $request->pelanggan_id, // Simpan pelanggan
                 'kanal' => 'pos',
                 'total' => $total,
                 'bayar' => $request->bayar,
@@ -86,7 +91,7 @@ class PosController extends Controller
                     'source_type' => Transaksi::class,
                     'source_id' => $transaksi->id,
                     'user_id' => auth()->id(),
-                    'alasan' => 'Penjualan POS'
+                    'alasan' => 'Penjualan POS',
                 ]);
             }
 
@@ -95,14 +100,15 @@ class PosController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Transaksi berhasil!',
-                'redirect' => route('kasir.pos.struk', $transaksi->id)
+                'redirect' => route('kasir.pos.struk', $transaksi->id),
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -110,11 +116,12 @@ class PosController extends Controller
     public function struk(Transaksi $transaksi)
     {
         // Pastikan kasir hanya bisa lihat struk miliknya
-        if ($transaksi->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+        if ($transaksi->user_id !== auth()->id() && ! auth()->user()->isAdmin()) {
             abort(403);
         }
 
-        $transaksi->load('details', 'user');
+        $transaksi->load('details', 'user', 'pelanggan');
+
         return view('kasir.pos.struk', compact('transaksi'));
     }
 }

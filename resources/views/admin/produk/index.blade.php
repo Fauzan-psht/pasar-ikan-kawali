@@ -5,20 +5,14 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <a href="{{ route('admin.produk.create') }}" class="btn btn-primary-custom">
-            <i class="bi bi-plus-lg me-1"></i> Tambah Produk Baru
-        </a>
-    </div>
-    <form action="{{ route('admin.produk.index') }}" method="GET" class="d-flex gap-2">
-        <input type="text" name="q" class="form-control form-control-sm" placeholder="Cari nama produk..." value="{{ request('q') }}">
-        <button class="btn btn-sm btn-outline-secondary">Cari</button>
-    </form>
+    <a href="{{ route('admin.produk.create') }}" class="btn btn-primary-custom">
+        <i class="bi bi-plus-lg me-1"></i> Tambah Produk Baru
+    </a>
 </div>
 
 <div class="panel">
     <div class="table-responsive">
-        <table class="table table-custom align-middle">
+        <table class="table table-custom align-middle w-100" id="productsTable">
             <thead>
                 <tr>
                     <th>Foto</th>
@@ -31,66 +25,129 @@
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse($produks as $p)
-                <tr>
-                    <td>
-                        @if($p->foto)
-                            <img src="{{ asset('storage/'.$p->foto) }}" alt="Foto" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-                        @else
-                            <div style="width: 60px; height: 60px; background: #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #64748b;">
-                                <i class="bi bi-image"></i>
-                            </div>
-                        @endif
-                    </td>
-                    <td>
-                        <div class="fw-bold">{{ $p->nama }}</div>
-                        <small class="text-muted">{{ Str::limit($p->deskripsi, 40) }}</small>
-                    </td>
-                    <td>{{ $p->kategori->nama }}</td>
-                    <td>
-                        @if($p->tipe_produk === 'konsumsi')
-                            <span class="badge-soft info">Konsumsi</span>
-                        @else
-                            <span class="badge-soft success">Benih</span>
-                        @endif
-                        <br><small>/ {{ $p->satuan }}</small>
-                    </td>
-                    <td class="fw-bold text-primary">Rp {{ number_format($p->harga_jual, 0, ',', '.') }}</td>
-                    <td>
-                        @if($p->stok <= $p->stok_minimum)
-                            <span class="text-danger fw-bold">{{ $p->stok }} {{ $p->satuan }}</span>
-                        @else
-                            {{ $p->stok }} {{ $p->satuan }}
-                        @endif
-                    </td>
-                    <td>
-                        @if($p->status)
-                            <span class="badge-soft success">Aktif</span>
-                        @else
-                            <span class="badge-soft danger">Nonaktif</span>
-                        @endif
-                    </td>
-                    <td class="text-center">
-                        <a href="{{ route('admin.produk.edit', $p->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus/menonaktifkan produk ini?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger" title="Hapus"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="8" class="text-center py-4 text-muted">Belum ada produk yang ditambahkan.</td>
-                </tr>
-                @endforelse
-            </tbody>
         </table>
-    </div>
-    <div class="mt-3">
-        {{ $produks->links() }}
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+    })[character]);
+    const storageUrl = @js(asset('storage'));
+
+    new window.DataTable('#productsTable', {
+        processing: true,
+        serverSide: true,
+        deferRender: true,
+        ajax: @js(route('admin.produk.index')),
+        searchDelay: 300,
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [[8, 'desc'], [9, 'desc']],
+        columns: [
+            {
+                data: 'foto',
+                name: 'produks.foto',
+                orderable: false,
+                searchable: false,
+                render: (foto, type) => {
+                    if (type !== 'display') {
+                        return foto;
+                    }
+
+                    if (!foto) {
+                        return '<div class="product-image-placeholder"><i class="bi bi-image"></i></div>';
+                    }
+
+                    return `<img src="${escapeHtml(storageUrl + '/' + foto)}" alt="Foto produk" class="product-table-image">`;
+                },
+            },
+            {
+                data: 'nama',
+                name: 'produks.nama',
+                render: (nama, type, row) => type === 'display'
+                    ? `<div class="fw-bold">${escapeHtml(nama)}</div><small class="text-muted">${escapeHtml(row.deskripsi || '')}</small>`
+                    : nama,
+            },
+            {
+                data: 'kategori_nama',
+                name: 'kategoris.nama',
+                render: (kategori, type) => type === 'display' ? escapeHtml(kategori || '-') : kategori,
+            },
+            {
+                data: 'tipe_produk',
+                name: 'produks.tipe_produk',
+                render: (tipe, type, row) => {
+                    if (type !== 'display') {
+                        return tipe;
+                    }
+
+                    const konsumsi = tipe === 'konsumsi';
+                    const label = konsumsi ? 'Konsumsi' : 'Benih';
+                    const badge = konsumsi ? 'info' : 'success';
+
+                    return `<span class="badge-soft ${badge}">${label}</span><br><small>/ ${escapeHtml(row.satuan)}</small>`;
+                },
+            },
+            {
+                data: 'harga_jual',
+                name: 'produks.harga_jual',
+                render: (harga, type) => type === 'display'
+                    ? `Rp ${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(Number(harga))}`
+                    : harga,
+            },
+            {
+                data: 'stok',
+                name: 'produks.stok',
+                render: (stok, type, row) => {
+                    if (type !== 'display') {
+                        return stok;
+                    }
+
+                    const formattedStock = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(Number(stok));
+                    const satuan = escapeHtml(row.satuan);
+
+                    return Number(stok) <= Number(row.stok_minimum)
+                        ? `<span class="text-danger fw-bold">${formattedStock} ${satuan}</span>`
+                        : `${formattedStock} ${satuan}`;
+                },
+            },
+            {
+                data: 'status',
+                name: 'produks.status',
+                render: (status, type) => {
+                    if (type !== 'display') {
+                        return status;
+                    }
+
+                    return status
+                        ? '<span class="badge-soft success">Aktif</span>'
+                        : '<span class="badge-soft danger">Nonaktif</span>';
+                },
+            },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false },
+            { data: 'created_at', name: 'produks.created_at', visible: false },
+            { data: 'id', name: 'produks.id', visible: false },
+        ],
+        language: {
+            processing: 'Memuat data...',
+            search: 'Cari:',
+            searchPlaceholder: 'Cari produk...',
+            lengthMenu: 'Tampilkan _MENU_ data',
+            info: 'Menampilkan _START_–_END_ dari _TOTAL_ produk',
+            infoEmpty: 'Belum ada produk',
+            zeroRecords: 'Produk tidak ditemukan',
+            emptyTable: 'Belum ada produk yang ditambahkan.',
+            paginate: { previous: 'Sebelumnya', next: 'Berikutnya' },
+        },
+    });
+});
+</script>
+@endpush

@@ -24,7 +24,7 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <select name="items[0][produk_id]" class="form-select" required>
+                                    <select name="items[0][produk_id]" class="form-select js-select2" required>
                                         <option value="">-- Pilih Produk --</option>
                                         @foreach($produks as $p)
                                             <option value="{{ $p->id }}">{{ $p->nama }} ({{ $p->satuan }})</option>
@@ -47,7 +47,7 @@
                 <div class="panel-title"><i class="bi bi-info-circle text-primary"></i> Info Penerimaan</div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Supplier <span class="text-danger">*</span></label>
-                    <select name="supplier_id" class="form-select" required>
+                    <select name="supplier_id" class="form-select js-select2" required>
                         <option value="">-- Pilih Supplier --</option>
                         @foreach($suppliers as $s)
                             <option value="{{ $s->id }}">{{ $s->nama }}</option>
@@ -78,7 +78,7 @@
         
         newRow.innerHTML = `
             <td>
-                <select name="items[${rowCount}][produk_id]" class="form-select" required>
+                <select name="items[${rowCount}][produk_id]" class="form-select js-select2" required>
                     <option value="">-- Pilih Produk --</option>
                     @foreach($produks as $p)
                         <option value="{{ $p->id }}">{{ $p->nama }} ({{ $p->satuan }})</option>
@@ -90,6 +90,7 @@
             <td class="subtotal-text align-middle">Rp 0</td>
             <td><button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()"><i class="bi bi-trash"></i></button></td>
         `;
+        window.initializeDashboardSelects(newRow);
         rowCount++;
     }
 </script>

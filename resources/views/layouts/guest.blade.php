@@ -1,3 +1,4 @@
+@php($profil = \App\Models\ProfilPasar::current())
 <!DOCTYPE html>
 <html lang="id">
     <head>
@@ -5,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Pasar Ikan Kawali') }} - Login</title>
+        <title>{{ $profil->nama }} - Login</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,12 +70,14 @@
             <div class="login-card w-full max-w-[1060px] min-h-screen sm:min-h-0 sm:rounded-[28px] overflow-hidden bg-white grid lg:grid-cols-[0.92fr_1.08fr]">
                 <section class="login-panel relative hidden lg:flex flex-col justify-between p-12 text-white overflow-hidden">
                     <a href="{{ route('public.home') }}" class="relative z-10 flex items-center gap-3 no-underline">
-                        <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 text-xl shadow-lg">
-                            <i class="bi bi-fish"></i>
-                        </span>
-                        <span class="login-brand text-xl font-bold text-white">
-                            Pasar Ikan <span class="text-teal-300">Kawali</span>
-                        </span>
+                        @if($profil->logo)
+                            <img src="{{ asset('storage/'.$profil->logo) }}" alt="Logo {{ $profil->nama }}" class="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-1 shadow-lg">
+                        @else
+                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 text-xl shadow-lg">
+                                <i class="bi bi-fish"></i>
+                            </span>
+                        @endif
+                        <span class="login-brand text-xl font-bold text-white">{{ $profil->nama }}</span>
                     </a>
 
                     <div class="relative z-10 my-auto py-12">
@@ -86,22 +89,26 @@
                             <span class="text-teal-300">lebih mudah.</span>
                         </h1>
                         <p class="mt-5 max-w-sm text-base leading-7 text-white/75">
-                            Masuk untuk mengelola produk, pesanan, transaksi, dan laporan Pasar Ikan Kawali.
+                            Masuk untuk mengelola produk, pesanan, transaksi, dan laporan {{ $profil->nama }}.
                         </p>
                     </div>
 
                     <p class="relative z-10 text-sm text-white/55">
-                        &copy; {{ date('Y') }} Pasar Ikan Kawali
+                        &copy; {{ date('Y') }} {{ $profil->nama }}
                     </p>
                 </section>
 
                 <section class="flex min-h-screen sm:min-h-[650px] flex-col justify-center px-6 py-10 sm:px-12 lg:min-h-[650px] lg:px-16">
                     <div class="mb-10 flex items-center justify-between lg:hidden">
                         <a href="{{ route('public.home') }}" class="login-brand flex items-center gap-2 no-underline">
-                            <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 text-white">
-                                <i class="bi bi-fish"></i>
-                            </span>
-                            <span class="font-bold text-slate-900">Pasar Ikan <span class="text-teal-600">Kawali</span></span>
+                            @if($profil->logo)
+                                <img src="{{ asset('storage/'.$profil->logo) }}" alt="Logo {{ $profil->nama }}" class="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-1">
+                            @else
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 text-white">
+                                    <i class="bi bi-fish"></i>
+                                </span>
+                            @endif
+                            <span class="font-bold text-slate-900">{{ $profil->nama }}</span>
                         </a>
                     </div>
 

@@ -55,11 +55,17 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">Telepon</label>
-                        <input type="text" name="telepon" class="form-control" value="{{ old('telepon', $profil->telepon) }}">
+                        <input type="text" name="telepon" class="form-control" value="{{ old('telepon', $profil->telepon) }}" inputmode="numeric" maxlength="13" pattern="[0-9]{1,13}" data-digits-only autocomplete="tel">
+                        @error('telepon')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">WhatsApp</label>
-                        <input type="text" name="whatsapp" class="form-control" value="{{ old('whatsapp', $profil->whatsapp) }}">
+                        <input type="text" name="whatsapp" class="form-control" value="{{ old('whatsapp', $profil->whatsapp) }}" inputmode="numeric" maxlength="13" pattern="[0-9]{1,13}" data-digits-only autocomplete="tel">
+                        @error('whatsapp')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">Email</label>

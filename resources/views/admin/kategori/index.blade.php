@@ -57,10 +57,12 @@
                                 @endif
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ $k->id }}"><i class="bi bi-pencil"></i></button>
-                                <form action="{{ route('admin.kategori.destroy', $k->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kategori ini?')">
+                                <!-- Perhatikan type="button" -->
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ $k->id }}"><i class="bi bi-pencil"></i></button>
+                                <form action="{{ route('admin.kategori.destroy', $k->id) }}" method="POST" class="d-inline" data-confirm="Hapus kategori ini?">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                                    <!-- Perhatikan type="submit" -->
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                                 </form>
                             </td>
                         </tr>

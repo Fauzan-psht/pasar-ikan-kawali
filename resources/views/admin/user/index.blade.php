@@ -58,7 +58,7 @@
                             <td class="text-center">
                                 <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editUser{{ $u->id }}"><i class="bi bi-pencil"></i></button>
                                 @if($u->id !== auth()->id())
-                                <form action="{{ route('admin.user.destroy', $u->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus user ini?')">
+                                <form action="{{ route('admin.user.destroy', $u->id) }}" method="POST" class="d-inline" data-confirm="Hapus user ini?" data-confirm-button="Ya, Hapus!">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                                 </form>

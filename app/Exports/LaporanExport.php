@@ -3,14 +3,16 @@
 namespace App\Exports;
 
 use App\Models\Transaksi;
+use Illuminate\Support\Enumerable;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class LaporanExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class LaporanExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     protected $startDate;
+
     protected $endDate;
 
     public function __construct($startDate, $endDate)
@@ -19,11 +21,11 @@ class LaporanExport implements FromCollection, WithHeadings, WithMapping, Should
         $this->endDate = $endDate;
     }
 
-    public function collection()
+    public function collection(): Enumerable
     {
         return Transaksi::with('user')
             ->where('status', 'paid')
-            ->whereBetween('created_at', [$this->startDate . ' 00:00:00', $this->endDate . ' 23:59:59'])
+            ->whereBetween('created_at', [$this->startDate.' 00:00:00', $this->endDate.' 23:59:59'])
             ->latest()
             ->get();
     }
@@ -35,7 +37,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithMapping, Should
             'Tanggal',
             'Kasir',
             'Total (Rp)',
-            'Status'
+            'Status',
         ];
     }
 

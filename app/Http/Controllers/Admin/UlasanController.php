@@ -10,6 +10,7 @@ class UlasanController extends Controller
 {
     public function index()
     {
+        // Ambil semua rating dengan relasi pesanan (jika ada)
         $ratings = Rating::with('pesanan')->latest()->paginate(15);
         return view('admin.ulasan.index', compact('ratings'));
     }
